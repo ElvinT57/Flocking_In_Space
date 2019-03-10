@@ -1,8 +1,8 @@
 # Flocking_In_Space
-Exploring Craig Reynolds' 1986 Flocking Simulation(https://en.wikipedia.org/wiki/Boids) in outer space.
+<p>Exploring Craig Reynolds' 1986 Flocking Simulation(https://en.wikipedia.org/wiki/Boids) in outer space.</p>
 
-Craig Reynold is a computer graphics expert. He and Ken Perlin worked on the computer graphics of the
-1976 movie <t>Tron</t>.
+<p>Craig Reynold is a computer graphics expert. He and Ken Perlin worked on the computer graphics of the
+1976 movie <i>Tron</i>. Reynold was fascinated by the natural system of birds flocking. <p>
 
 <h2>Flocking Rules</h2>
   <p><b>1. Separation</b>: Steer to avoid crowding local flockmates.</p>
