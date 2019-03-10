@@ -28,9 +28,15 @@ it by using computer graphics skills.</p>
  <li>A - Set object type for the add new object method to Asteroid.</li>
  <li>R - Set object type for the add new object method to Rocket.</li>
  <li>1 - Change to asteroid scenario.</li>
+ <br/>
  <img width="300px" height ="200px" src ="https://github.com/ElvinT57/Flocking_In_Space/blob/master/images/screenshot.png">
+ <br/>
  <li>2 - Change to atmosphere scenario.</li>
- <img width="300px" height ="200px" src ="">
- 
+ <br/>
+ <img width="300px" height ="200px" src ="https://github.com/ElvinT57/Flocking_In_Space/blob/master/images/screenshot2.png">
+ <br/>
  <li>3 - Change to space junk scenario.</li>
+ <br/>
+ <img width="300px" height ="200px" src ="https://github.com/ElvinT57/Flocking_In_Space/blob/master/images/screenshot3.png">
+ <br/>
 </ul></p>
