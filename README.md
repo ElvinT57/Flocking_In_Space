@@ -7,7 +7,7 @@ it by using computer graphics skills.</p>
 <br/>
 <p>We created our own interpretation of this model using rockets as the Boids, and asteroids, space junk, and 
  wind forces as obstacles.</p>
- <img src="https://github.com/ElvinT57/Flocking_In_Space/blob/master/screenshot.png">
+ <img src= "https://github.com/ElvinT57/Flocking_In_Space/blob/master/images/screenshot.png">
 <h2>Flocking Rules</h2>
   <p><b>1. Separation</b>: Steer to avoid crowding local flockmates.</p>
   <img src="https://www.red3d.com/cwr/boids/images/separation.gif">
@@ -28,6 +28,9 @@ it by using computer graphics skills.</p>
  <li>A - Set object type for the add new object method to Asteroid.</li>
  <li>R - Set object type for the add new object method to Rocket.</li>
  <li>1 - Change to asteroid scenario.</li>
+ <img width="300px" height ="200px" src ="https://github.com/ElvinT57/Flocking_In_Space/blob/master/images/screenshot.png">
  <li>2 - Change to atmosphere scenario.</li>
+ <img width="300px" height ="200px" src ="">
+ 
  <li>3 - Change to space junk scenario.</li>
 </ul></p>
