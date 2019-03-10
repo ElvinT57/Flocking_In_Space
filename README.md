@@ -15,3 +15,14 @@ it by using computer graphics skills.</p>
   <img src="https://www.red3d.com/cwr/boids/images/alignment.gif">
   <p><b>3. Cohesion</b>: Steer to move toward the average position of local flockmates.<p>
   <img src="https://www.red3d.com/cwr/boids/images/cohesion.gif">
+ 
+ <h2>Download Instructions</h2>
+ <p><ol>
+ <li>Download Processing IDE to this program. (Processing.org)</li>
+ <li>Add the ControlP5 library to Processing.</li>
+</ol></p>
+
+<h2>User Controls</h2>
+<p><<ul>
+ <li>Right Click: Add a new object at the given mouse x and y.</li>
+</ul></p>
