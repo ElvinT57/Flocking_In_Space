@@ -23,6 +23,11 @@ it by using computer graphics skills.</p>
 </ol></p>
 
 <h2>User Controls</h2>
-<p><<ul>
- <li>Right Click: Add a new object at the given mouse x and y.</li>
+<p><ul>
+ <li>Right Click - Add a new object at the given mouse x and y.</li>
+ <li>A - Set object type for the add new object method to Asteroid.</li>
+ <li>R - Set object type for the add new object method to Rocket.</li>
+ <li>1 - Change to asteroid scenario.</li>
+ <li>2 - Change to atmosphere scenario.</li>
+ <li>3 - Change to space junk scenario.</li>
 </ul></p>
