@@ -7,7 +7,7 @@ it by using computer graphics skills.</p>
 <br/>
 <p>We created our own interpretation of this model using rockets as the Boids, and asteroids, space junk, and 
  wind forces as obstacles</p>
- 
+ <img src="https://github.com/ElvinT57/Flocking_In_Space/blob/master/screenshot.png">
 <h2>Flocking Rules</h2>
   <p><b>1. Separation</b>: Steer to avoid crowding local flockmates.</p>
   <img src="https://www.red3d.com/cwr/boids/images/separation.gif">
