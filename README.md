@@ -1,4 +1,5 @@
 # Flocking_In_Space
+<p>Authors - Elvin Torres, James Vu, Luke LaValva, and Gabriel Angel</p>
 <p>Exploring Craig Reynolds' 1986 Flocking Simulation(https://en.wikipedia.org/wiki/Boids) in outer space.</p>
 
 <p>Craig Reynolds is a computer graphics expert. He and Ken Perlin worked on the computer graphics of the
