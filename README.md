@@ -3,8 +3,8 @@
 <p>Exploring Craig Reynolds' 1986 Flocking Simulation(https://en.wikipedia.org/wiki/Boids) in outer space.</p>
 
 <p>Craig Reynolds is a computer graphics expert. He and Ken Perlin worked on the computer graphics of the
-1976 movie <i>Tron</i>. Reynolds was fascinated by the natural system of birds flocking and wanted to simulate
-it by using computer graphics skills.</p>
+1976 movie, <i>Tron</i>. Reynolds was fascinated by the natural system of birds flocking and wanted to simulate
+it by using his computer graphics skills.</p>
 <br/>
 <p>We created our own interpretation of this model using rockets as the Boids, and asteroids, space junk, and 
  wind forces as obstacles.</p>
