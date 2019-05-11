@@ -20,7 +20,7 @@ it by using his computer graphics skills.</p>
  <h2>Download Instructions</h2>
  <p><ol>
  <li>Download Processing IDE to this program. (Processing.org)</li>
- <li>Add the ControlP5 library to Processing.</li>
+ <li>Add the ControlP5 library to Processing. ( Sketch >> Import Library >> add library)</li>
 </ol></p>
 
 <h2>User Controls</h2>
