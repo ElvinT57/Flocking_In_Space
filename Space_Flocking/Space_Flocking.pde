@@ -1,31 +1,33 @@
 import controlP5.*;
+
 ControlP5 cp5;
-String textfieldname = "City you want to hover";
+String textfieldname = "Enter City";
 String city = "Glassboro";
 PFont font;
+JSONObject json;
+
 // An arraylist of astroids
 ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 // An arraylist of Junk 
 ArrayList<Junk> junk = new ArrayList<Junk>();
-JSONObject json;
 Satellite sat;
-//Wind vector
-PVector windForce;
-Rain[] rain;
+
+
 
 //flock variables
 float cohesionRadius = 100;
 float alignRadius = 50;
-float desiredseparation = 50;
+float desiredSeparation = 70;
 
 //fleet system
 Fleet fleet;
-int numOfRockets = 50;
+int numOfRockets = 30;
 Stars s;
 int numOfAsteroids = 20;
 String mode = "r";
 boolean inSpace = true;
 boolean isJunk = false;
+boolean debug = false; 
 int numOfJunk = 100;
 
 
@@ -34,6 +36,7 @@ int windSpeed = 0;
 int angle = 0;
 String name = "";
 String weather = "";
+PVector windForce;
 
 void setup() {
   sat = new Satellite();
@@ -47,7 +50,7 @@ void setup() {
   fleet = new Fleet();
   //adding the fleet
   for (int i = 0; i < numOfRockets; i++) 
-    fleet.addRocket(new Rocket(random(width), random(height)));
+    fleet.addRocket(new Rocket(random(width), random(height), 4));
 
   //adding the astroids
   for (int i = 0; i < numOfAsteroids; i++) 
@@ -82,36 +85,39 @@ void draw() {
   //UI
   stroke(175, 175, 175, 50);
   fill(175, 175, 175, 30);
-  rect(5, height-300, 150, 225);
+  rect(5, height-300, 150, 240);
   //cohension variables display
   fill(255); 
   text("Cohesion: " + cohesionRadius +" m", 10, height-275);
   text("Alignment: " + alignRadius + " m", 10, height-250);
-  text("Separation: " + desiredseparation + " m", 10, height-225);
+  text("Separation: " + desiredSeparation + " m", 10, height-225);
   //controls
   textSize(15); 
-  text("A: add Asteroid", 10, height-200); 
-  text("R: add Rocket", 10, height-175); 
-  text("1: Space", 10, height-150); 
-  text("2: Atmosphere", 10, height-125); 
-  text("3: Seek Junk", 10, height-100);
+  text("A: Add Asteroid", 10, height-200); 
+  text("R: Add Rocket", 10, height-175); 
+  text("D: Debug Mode", 10, height-150);
+  text("1: Space", 10, height-125); 
+  text("2: Atmosphere", 10, height-100); 
+  text("3: Seek Junk", 10, height-75);
 
   //display framerate
   text(frameRate, width-100, height-45);
 }
 
 void mousePressed() {
+  saveFrame("screenshot.png");
   //checks the current mode
   if (mode.equals("r")) {
     //add new rockets at mouse position
-    fleet.addRocket(new Rocket(mouseX, mouseY));
+    fleet.addRocket(new Rocket(mouseX, mouseY, 4));
   } else if (mode.equals("a")) {
     asteroids.add(new Asteroid(mouseX, mouseY));
   }
 }
 
 void keyPressed() {
-  if (key == '1') {
+  switch(key) {
+  case '1':
     if (!inSpace) {
       for (int i = 0; i < numOfAsteroids; i++)
         asteroids.add(new Asteroid());
@@ -122,8 +128,8 @@ void keyPressed() {
     for (Rocket r : fleet.getFleet()) 
       r.cohesionRadius = cohesionRadius;
     inSpace = true;
-    rain = null;
-  } else if (key == '2') {
+    break;
+  case '2':
     //reset the fleet
     fleet.reset(); 
     //in atmosphere, let cohesion radius be 250
@@ -132,20 +138,16 @@ void keyPressed() {
       r.maxspeed = 2;
       r.maxforce = .5;
     }
-    //initilize rain array
-    rain = new Rain[80];
-    for (int i = 0; i < rain.length; i++) {
-      rain[i] = new Rain();
-    }
     inSpace = false;
     isJunk = false;
     //remove all asteroids and junk
     asteroids.clear();
     junk.clear();
-  } else if (key == '3') {
+    break;
+  case '3':
     //if we are not in junk destroying mode already
     if (!isJunk) {
-      for (int i = 0; i < numOfAsteroids; i++)
+      for (int i = 0; i < numOfJunk; i++)
         junk.add(new Junk());
     }
     //reset the fleet and then reinitialize the max speed and force
@@ -157,29 +159,42 @@ void keyPressed() {
     }
     inSpace = false;
     isJunk = true;
-    rain = null;
     //clear out asteroids
     asteroids.clear();
-  } else if (key == 'a') {
+    break;
+  case 'a':
     mode = "a";
-  } else if (key == 'i') {
+    break;
+  case 'r':
+    mode = "r";
+    break;
+  case 'd':
+    debug = !debug;
+    break;
+  case 'i':
     cohesionRadius++;
     updateVariables();
-  } else if (key == 'j') {
+    break;
+  case 'j':
     cohesionRadius--;
     updateVariables();
-  } else if (key == 'o') {
+    break;
+  case 'o':
     alignRadius++;
     updateVariables();
-  } else if (key == 'k') {
+    break;
+  case 'k':
     alignRadius--;
     updateVariables();
-  } else if (key == 'p') {
-    desiredseparation++;
+    break;
+  case 'p':
+    desiredSeparation++;
     updateVariables();
-  } else if (key == 'l') {
-    desiredseparation--;
+    break;
+  case 'l':
+    desiredSeparation--;
     updateVariables();
+    break;
   }
 }
 
@@ -196,13 +211,12 @@ void space() {
     a.move(); 
     a.display(); 
     if (a.reachedBottom())
-    {
       a.reset();
-    }
   }
 }
+
 void atmosphere() {
-  background(0, 191, 255);
+  background(0, 100, 155);
 
   //String weather = "Raining";
   //int windSpeed = 5;
@@ -220,10 +234,10 @@ void atmosphere() {
   textSize(20);
   text("Flying over " + name +", at " + windSpeed + " meters/hour in the direction of " +angle+"°. Current Weather is " + weather, (width/2)-375, 20);
 }
+
 void controlEvent(ControlEvent theEvent) {
-  if (theEvent.isAssignableFrom(Textfield.class)) {
+  if (theEvent.isAssignableFrom(Textfield.class)) 
     city = theEvent.getStringValue();
-  }
   json = loadJSONObject("https://api.openweathermap.org/data/2.5/weather?q=" + city + ",us&appid=9b9dc8e944471d14f7a8e8dc8148d41a");
   //json = loadJSONObject("https://samples.openweathermap.org/data/2.5/weather?q=London,uk&appid=b6907d289e10d714a6e88b30761fae22");
   windSpeed = json.getJSONObject("wind").getInt("speed");
@@ -232,6 +246,7 @@ void controlEvent(ControlEvent theEvent) {
   JSONArray lib = json.getJSONArray("weather");
   weather = lib.getJSONObject(0).getString("main");
 }
+
 void junkMode() {
   background(0); 
   //stars
@@ -246,18 +261,17 @@ void junkMode() {
     j.move(); 
     j.display(); 
     if (j.reachedBottom())
-    {
       j.reset();
-    }
   }
   sat.wrapAround();
   sat.display();
   sat.move();
 }
+
 void updateVariables() {
   for (Rocket r : fleet.getFleet()) {
     r.cohesionRadius =  cohesionRadius;
     r.alignRadius = alignRadius;
-    r.desiredseparation = desiredseparation;
+    r.desiredSeparation = desiredSeparation;
   }
 }

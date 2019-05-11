@@ -1,31 +1,28 @@
 class Rocket extends Body {
   PVector velocity;
   PVector acceleration;
-  float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-  float [] rgb = {random(100, 255), random(50), random(100, 255)};
 
 
-  //flock variables
-  float cohesionRadius = 100;
-  float alignRadius = 50;
-  float desiredseparation = 50;
+  //flocking variables
+  float cohesionRadius;
+  float alignRadius;
+  float desiredSeparation;
 
-  Rocket(float x, float y) {
-    super(x, y);
+  Rocket(float x, float y, float r) {
+    super(x, y, r);
     acceleration = new PVector(0, 0);
     img = loadImage("spaceship.png");
-    // This is a new PVector method not yet implemented in JS
-    // velocity = PVector.random2D();
-
-    // Leaving the code temporarily this way so that this example runs in JS
-    float angle = random(TWO_PI);
+    float angle = 0;
     velocity = new PVector(cos(angle), sin(angle));
 
-    r = 4;
     maxspeed = 2;
     maxforce = .02;
+
+    cohesionRadius = 100;
+    alignRadius = 50;
+    desiredSeparation = 50;
   }
 
   /*
@@ -34,8 +31,8 @@ class Rocket extends Body {
   void run(ArrayList<Rocket> rockets, ArrayList<Asteroid> asteroids) {
     flock(rockets, asteroids);
     update();
-    borders();
-    render();
+    wrapAround();
+    render(debug);
   }
 
   /*  
@@ -44,35 +41,36 @@ class Rocket extends Body {
   void run(ArrayList<Rocket> rockets) {
     flock(rockets, asteroids);
     update();
-    borders();
-    render();
+    wrapAround();
+    render(debug);
   }
 
   void applyForce(PVector force) {
-    // We could add mass here if we want A = F / M
+    // Use Newton's A = F / M, but ignore mass. Assume everything is unit 1
     acceleration.add(force);
   }
 
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Rocket> rockets, ArrayList<Asteroid> asteroids) {
-    PVector sep = separate(rockets);   // Separation
-    PVector asteroidSep = avoidAsteroid(asteroids);
+    //caculate each vector
+    PVector sep = separation(rockets);   // Separation
+    PVector ast = avoidAsteroid(asteroids);  //asteroid avoidance force 
     PVector ali = align(rockets);      // Alignment
     PVector coh = cohesion(rockets);   // Cohesion
 
-    // Arbitrarily weight these forces
+    // weight these forces
     sep.mult(1.5);
     ali.mult(1.5);
     coh.mult(1.0);
-    asteroidSep.mult(2);
+    ast.mult(2);
     // Add the force vectors to acceleration
     applyForce(sep);
-    applyForce(asteroidSep);
+    applyForce(ast);
     applyForce(ali);
     applyForce(coh);
   }
 
-  // Method to update location
+  // Update the rocket's position
   void update() {
     // Update velocity
     velocity.add(acceleration);
@@ -83,121 +81,105 @@ class Rocket extends Body {
     acceleration.mult(0);
   }
 
-  // A method that calculates and applies a steering force towards a target
-  // STEER = DESIRED MINUS VELOCITY
+  /*
+  * Returns the force needed to seek an object using
+   * Reynold's steering formula: Steering = Desired - Velocity
+   */
   PVector seek(PVector target) {
     PVector desired = PVector.sub(target, location);  // A vector pointing from the location to the target
     // Scale to maximum speed
     desired.normalize();
     desired.mult(maxspeed);
 
-    // Above two lines of code below could be condensed with new PVector setMag() method
-    // Not using this method until Processing.js catches up
-    // desired.setMag(maxspeed);
-
-    // Steering = Desired minus Velocity
     PVector steer = PVector.sub(desired, velocity);
-    steer.limit(maxforce);  // Limit to maximum steering force
+    steer.limit(maxforce);  
     return steer;
   }
 
-  void render() {
+  void render(boolean debug) {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
-    // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
 
-    fill(rgb[0], rgb[1], rgb[2]);
-    stroke(rgb[0], rgb[1], rgb[2]);
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
-    //tint it to the its brightest setting to prevent other tints
-    tint(255);
-    image(img, -r*5, -r*5, r*10, r*10);
+    if (debug) {
+      //display each flocking radius and seperation distance
+      noFill();
+      stroke(0,255,50);
+      ellipse(0,0, alignRadius, alignRadius);
+      stroke(255,0,50);
+      ellipse(0,0, desiredSeparation, desiredSeparation);
+      stroke(50,0,255);
+      ellipse(0,0, cohesionRadius, cohesionRadius);
+      stroke(175);
+      fill(175);
+      triangle(-5, 5, 0, -5, 5, 5);
+    } else {
+      //tint it to the its brightest setting to prevent other tints
+      tint(255);
+      image(img, -r*5, -r*5, r*10, r*10);
+    }
     popMatrix();
   }
 
-  // Wraparound
-  void borders() {
-    if (location.x < -r) location.x = width+r;
-    if (location.y < -r) location.y = height+r;
-    if (location.x > width+r) location.x = -r;
-    if (location.y > height+r) location.y = -r;
-  }
-
-  // Separation
-  // Method checks for nearby boids and steers away
-  PVector separate (ArrayList<Rocket> rockets) {
-    PVector steer = new PVector(0, 0, 0);
-    int count = 0;
-    // For every boid in the system, check if it's too close
-    for (Body other : rockets) {
+  /*
+  * Returns the force required to maintain desired separation 
+   */
+  PVector separation(ArrayList<Rocket> others) {
+    PVector steer = new PVector(0, 0);
+    int count = 0;  //number of neighbors around this rocket
+    // For every boid in the system, check if it is a neighbor
+    for (Rocket other : others) {
       float d = PVector.dist(location, other.location);
       // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-      if ((d > 0) && (d < desiredseparation)) {
+      if ((d > 0) && (d < desiredSeparation)) {
         // Calculate vector pointing away from neighbor
         PVector diff = PVector.sub(location, other.location);
         diff.normalize();
         diff.div(d);        // Weight by distance
         steer.add(diff);
-        count++;            // Keep track of how many
+        count++;            // Keep track of how many neighbors
       }
     }
-    // Average -- divide by how many
-    if (count > 0) {
+    // calculate the average
+    if (count > 0)
       steer.div((float)count);
+    return steeringForce(steer);
+  }
+
+  PVector avoidAsteroid(ArrayList<Asteroid> asteroids) {
+    PVector steer = new PVector(0, 0);
+    int count = 0;  //number of neighbors around this rocket
+    // For every boid in the system, check if it is a neighbor
+    for (Asteroid asteroid : asteroids) {
+      float d = PVector.dist(location, asteroid.location);
+      if ((d > 0) && (d < asteroid.r * 4.5)) {
+        // Calculate vector pointing away from neighbor
+        PVector diff = PVector.sub(location, asteroid.location);
+        diff.normalize();
+        diff.div(d);        // Weight by distance
+        steer.add(diff);
+        count++;            // Keep track of how many neighboring asteroids
+      }
     }
+    // calculate the average
+    if (count > 0)
+      steer.div((float)count);
+    return steeringForce(steer);
+  }
 
-    // As long as the vector is greater than 0
+  //caculcate the steering force of seperation: Steering = Desired - Velocity
+  PVector steeringForce(PVector steer) {
     if (steer.mag() > 0) {
-      // First two lines of code below could be condensed with new PVector setMag() method
-      // Not using this method until Processing.js catches up
-      // steer.setMag(maxspeed);
-
-      // Implement Reynolds: Steering = Desired - Velocity
       steer.normalize();
-      steer.mult(maxspeed);
+      steer.mult(maxspeed);  
       steer.sub(velocity);
       steer.limit(maxforce);
     }
     return steer;
   }
 
-  PVector avoidAsteroid (ArrayList<Asteroid> asteroids) {
-    PVector steer = new PVector(0, 0, 0);
-    int count = 0;
-    // For every boid in the system, check if it's too close
-    for (Asteroid other : asteroids) {
-      float d = PVector.dist(location, other.location);
-      // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-      if ((d > 0) && (d < other.r*5)) {
-        // Calculate vector pointing away from neighbor
-        PVector diff = PVector.sub(location, other.location);
-        diff.normalize();
-        diff.div(d);        // Weight by distance
-        steer.add(diff);
-        count++;            // Keep track of how many
-      }
-    }
-    // Average -- divide by how many
-    if (count > 0) {
-      steer.div((float)count);
-    }
-
-    // As long as the vector is greater than 0
-    if (steer.mag() > 0) {
-      // First two lines of code below could be condensed with new PVector setMag() method
-      // Not using this method until Processing.js catches up
-      // steer.setMag(maxspeed);
-
-      // Implement Reynolds: Steering = Desired - Velocity
-      steer.normalize();
-      steer.mult(maxspeed);
-      steer.sub(velocity);
-      steer.limit(maxforce);
-    }
-    return steer;
-  }
   void seekJunk(ArrayList<Junk> junk) {
     for (int i = 0; i < junk.size(); i++) {
       float d = PVector.dist(location, junk.get(i).location);
@@ -224,7 +206,7 @@ class Rocket extends Body {
     for (Rocket other : rockets) {
       float d = PVector.dist(location, other.location);
       if ((d > 0) && (d < alignRadius)) {
-        sum.add(other.velocity);
+        sum.add(((Rocket)other).velocity);
         count++;
       }
     }

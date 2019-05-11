@@ -2,24 +2,21 @@
 class Asteroid extends Body {
   //float speed; // Speed of asteroid
   PVector speed;
-  float r;
   float tint;
 
   Asteroid() { 
-    super(random(width), random(height));
+    super(random(width), random(height), random(20, 50));
     img = loadImage("asteroid.png");
     speed = new PVector(random(-1, 1), random(0.1, 1)); 
     tint = random(100, 255);
-    r = random(20, 50);
   }
   Asteroid(float x, float y) { 
-    super(x, y);
+    super(x, y, random(20, 50));
     img = loadImage("asteroid.png");
-    speed = new PVector(random(-1,1), random(0.1, 1)); 
-    tint = random(100,255);
-    r = random(20, 50); 
+    speed = new PVector(random(-1, 1), random(0.1, 1)); 
+    tint = random(100, 255);
   }
-  
+
   PVector returnloc() {
     return location;
   }
@@ -51,17 +48,6 @@ class Asteroid extends Body {
       location.x = 0;
       speed.x *= -1;
     }
-  }
-
-  void wrapAround() {
-    if (location.x > width)
-      location.x = 0; 
-    else if (location.x < 0)
-      location.x = width;
-    else if (location.y > height)
-      location.y = 0;
-    else if (location.y < 0)
-      location.y = height;
   }
 
   // Display the asteroid
